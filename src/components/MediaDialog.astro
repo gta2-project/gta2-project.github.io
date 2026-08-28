@@ -1,0 +1,22 @@
+---
+interface Props {
+	id: string;
+	title: string;
+	description: string;
+	src: string;
+	poster: string;
+}
+
+const { id, title, description, src, poster } = Astro.props;
+---
+
+<dialog class="media-dialog" id={id} data-media-dialog>
+	<div class="dialog-shell">
+		<header>
+			<div><p>GTA-2 · Video</p><h2>{title}</h2></div>
+			<button type="button" data-dialog-close aria-label={`Close ${title}`}>Close</button>
+		</header>
+		<video controls playsinline preload="none" data-dialog-video data-src={src} data-poster={poster}></video>
+		<p class="dialog-description">{description}</p>
+	</div>
+</dialog>

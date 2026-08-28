@@ -1,0 +1,362 @@
+---
+import { Image } from 'astro:assets';
+import Wordmark from '../components/Wordmark.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import Filmstrip from '../components/Filmstrip.astro';
+import MethodFlow from '../components/MethodFlow.astro';
+import BenchmarkChart from '../components/BenchmarkChart.astro';
+import MediaDialog from '../components/MediaDialog.astro';
+import ImageLightbox from '../components/ImageLightbox.astro';
+import methodArchitecture from '../assets/method-architecture.png';
+import taskPanorama from '../assets/task-panorama.png';
+import feedbackOriginal from '../assets/feedback-original.png';
+import resultsOriginal from '../assets/results-original.png';
+import { benchmarkTasks, methodSteps, moreBehaviors, taskDemos } from '../data/site';
+import '../styles/global.css';
+
+const canonical = new URL('/', Astro.site);
+const fullAbstract = 'Robotic manipulation tasks are often decomposed into reusable behaviors or skills, yet these units can remain too coarse to expose the geometric, control, and scene-dependent decisions required for execution. We introduce Grounded Task Axes version 2 (GTA-2), a modular multi-agent vision-language model (VLM) framework that constructs executable manipulation skills from reusable object-centric task-axis components. Rather than predicting actions end-to-end or relying on predefined task-level skill primitives, GTA-2 explicitly represents manipulation structure through semantic subtasks, task-relevant keypoints and axes, controller compositions, and scene-dependent parameters. Four specialized VLM agents progressively decompose the task, generate an abstract task-axis skill, assign controller parameters, and ground the required visual features in an RGB-D observation. This separation between abstract skill construction and scene-specific instantiation enables zero-shot generation of new manipulation behaviors without task-specific robot demonstrations, policy training, or fine-tuning. Because the intermediate decisions remain explicit, users can also provide targeted feedback to the responsible agent while preserving components of the generated skill that are already correct. We evaluate GTA-2 on a real robot across 14 diverse manipulation tasks and compare it against the generalist VLA policy π0.5 and two Code-as-Policies baselines using either task-axis controllers or conventional robot primitives. GTA-2 achieves stronger zero-shot execution across the benchmark, while targeted refinement further improves and stabilizes skill generalization across scene configurations.';
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="generator" content={Astro.generator} />
+		<meta name="theme-color" content="#07080a" />
+		<meta name="description" content="GTA-2 composes interpretable and correctable robot manipulation skills from task-axis controllers—zero-shot." />
+		<meta name="robots" content="index,follow,max-image-preview:large" />
+		<meta property="og:type" content="website" />
+		<meta property="og:title" content="GTA-2 — Grounded Task Axes 2" />
+		<meta property="og:description" content="A VLM framework for zero-shot robot manipulation via object-centric task-axis controllers." />
+		<meta property="og:url" content={canonical} />
+		<meta property="og:image" content={new URL('/gta2-social-card.png', Astro.site)} />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+		<meta property="og:image:alt" content="GTA-2 wordmark beside a robot and grounded point-cloud scene" />
+		<meta name="twitter:card" content="summary_large_image" />
+		<link rel="canonical" href={canonical} />
+		<link rel="icon" href="/favicon.svg" />
+		<title>GTA-2 — Grounded Task Axes 2</title>
+	</head>
+	<body>
+		<a class="skip-link" href="#main-content">Skip to content</a>
+		<header class="site-nav">
+			<a class="nav-mark" href="#top" aria-label="GTA-2 home">GTA<span>–2</span></a>
+			<nav class="nav-links" aria-label="Primary navigation">
+				<a href="#tasks">Tasks</a>
+				<a href="#method">Method</a>
+				<a href="#results">Results</a>
+				<a href="#more">More</a>
+			</nav>
+			<details class="mobile-nav">
+				<summary>Menu <i aria-hidden="true"></i></summary>
+				<nav aria-label="Mobile navigation"><a href="#tasks">Tasks</a><a href="#method">Method</a><a href="#results">Results</a><a href="#more">More</a></nav>
+			</details>
+		</header>
+
+		<main id="main-content">
+			<section class="hero" id="top" aria-labelledby="hero-title">
+				<div class="hero-shell">
+					<div class="hero-copy">
+						<p class="eyebrow">Grounded Task Axes · Version 2</p>
+						<Wordmark />
+						<h1 id="hero-title">From Language to Manipulation: <em>Composing Object-Centric Skills from Scratch.</em></h1>
+						<p class="hero-lede"><strong>GTA-2 turns high-level language instructions into executable, interpretable, and correctable robot manipulation skills</strong> through task-axis controller compositions—zero-shot, without task-specific demonstrations or training.</p>
+					</div>
+
+					<div class="hero-media">
+						<div class="hero-media-actions" aria-label="Project links">
+							<a class="button button--primary" href="/gta2-initial-report.pdf">Initial Report · PDF</a>
+							<span class="button button--ghost button--disabled" aria-disabled="true">Paper · Coming Soon</span>
+							<span class="button button--ghost button--disabled" aria-disabled="true">Code · Coming Soon</span>
+						</div>
+						<div class="hero-frame">
+							<button class="hero-frame-trigger" type="button" data-dialog-open="gui-demo-dialog" aria-label="Watch the full GTA-2 demo"></button>
+							<button class="media-status" type="button" data-dialog-open="gui-demo-dialog"><i></i> Watch the Full Demo</button>
+							<video muted playsinline loop autoplay preload="metadata" poster="/media/gta2-hero-poster.jpg" data-hero-video aria-label="A short GTA-2 demo showing task generation, robot execution, feedback, and revised execution">
+								<source src="/media/gta2-hero-cut.mp4" type="video/mp4" />
+							</video>
+						</div>
+						<div class="hero-sequence" aria-hidden="true">
+							<span>Instruction</span><b></b><span>Composition</span><b></b><span>Execution</span><b></b><span>Refinement</span>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section class="paper-section task-section" id="tasks" aria-labelledby="tasks-heading">
+				<div class="section-shell section-shell--wide">
+					<SectionHeader id="tasks-heading" eyebrow="01 · Task breadth" title="Fourteen different real-world tasks—" titleLine2="no demonstrations provided." description="The benchmark spans contact-rich surface interaction and coverage, precision alignment and fastening, articulated-object and device operation, semantic ordering and multi-object organization, deformable-object manipulation, obstacle-aware pick-and-place, and pouring and material transfer." />
+					<div class="panorama-card">
+						<Image src={taskPanorama} alt="Fourteen real-robot benchmark tasks evaluated in the GTA-2 study" widths={[960, 1440, 2200]} sizes="(max-width: 960px) 94vw, 88vw" loading="eager" />
+					</div>
+					<Filmstrip tasks={taskDemos} />
+				</div>
+			</section>
+
+			<section class="paper-section overview-section" id="overview" aria-labelledby="overview-heading">
+				<div class="section-shell">
+					<SectionHeader id="overview-heading" eyebrow="02 · Overview" title="Manipulation stays explicit" titleLine2="from intent to control." description="The system separates reasoning about what the task means from the geometric and control decisions required to execute it." />
+					<div class="overview-grid">
+						<div class="overview-thesis">
+							<p>Most reusable robot skills are still large units: <em>pick</em>, <em>place</em>, <em>open</em>. GTA-2 composes below that level.</p>
+							<blockquote>Sub-atomic composition means constructing each subtask from task-relevant keypoints, axes, constraints, and controllers—the reusable structure beneath a conventional primitive.</blockquote>
+						</div>
+						<ol class="principles">
+							<li><span>01</span><div><h3>Decompose task intent</h3><p>Expose semantic subtasks in an ordered, inspectable plan.</p></div></li>
+							<li><span>02</span><div><h3>Compose at the sub-atomic level</h3><p>Build each subtask from object-centric task-axis controller compositions.</p></div></li>
+							<li><span>03</span><div><h3>Correct locally</h3><p>Route feedback to the responsible stage while preserving decisions that are already correct.</p></div></li>
+						</ol>
+					</div>
+					<details class="abstract-card">
+						<summary><span>Read the full abstract</span><i>+</i></summary>
+						<p>{fullAbstract}</p>
+					</details>
+				</div>
+			</section>
+
+			<section class="dark-section method-section" id="method" aria-labelledby="method-heading">
+				<div class="section-shell section-shell--wide">
+					<SectionHeader id="method-heading" tone="dark" eyebrow="03 · Method" title="Four VLMs—each specialized" titleLine2="in a different aspect of manipulation." description="Four specialized VLM agents transform task intent into a grounded controller composition. Scroll to follow the representation as it becomes executable." />
+					<MethodFlow steps={methodSteps} />
+					<div class="method-references">
+						<div><p>Inspect the source figure.</p><span>The web-native diagram now follows the paper’s bottle-to-box example and its intermediate outputs.</span></div>
+						<button class="button" type="button" data-dialog-open="method-figure-dialog">Open original architecture</button>
+					</div>
+				</div>
+			</section>
+
+			<section class="paper-section feedback-section" id="refinement" aria-labelledby="refinement-heading">
+				<div class="section-shell section-shell--wide">
+					<SectionHeader id="refinement-heading" eyebrow="04 · Targeted refinement" title="Correct the responsible stage," titleLine2="not the whole behavior." description="Because intermediate decisions remain explicit, feedback can update decomposition, skill structure, parameters, or visual grounding independently." />
+					<div class="feedback-intro">
+						<p>Execution failures are attributed to the agent that made the responsible decision. The rest of the generated behavior is retained.</p>
+						<div><span>Task</span><i>→</i><span>Skill</span><i>→</i><span>Parameters</span><i>→</i><span>Vision</span></div>
+					</div>
+					<figure class="paper-experiment-figure paper-experiment-figure--light">
+						<button type="button" data-dialog-open="feedback-figure-dialog" aria-label="Open the targeted feedback progression figure at full size">
+							<Image src={feedbackOriginal} alt="Zero-shot plan generation and targeted feedback progression across fourteen real-world manipulation tasks" widths={[1200, 2000, 3000]} sizes="(max-width: 960px) 94vw, 88vw" loading="lazy" />
+						</button>
+					</figure>
+					<div class="figure-actions">
+						<p><strong>15 scene configurations per task.</strong> Colored segments identify the responsible feedback stage; white segments are successful executions.</p>
+						<div><button class="text-button" type="button" data-dialog-open="feedback-figure-dialog">Open original figure ↗</button><button class="button button--dark" type="button" data-dialog-open="gui-demo-dialog">Watch Full Demo</button></div>
+					</div>
+				</div>
+			</section>
+
+			<section class="dark-section results-section" id="results" aria-labelledby="results-heading">
+				<div class="section-shell section-shell--wide">
+					<header class="section-heading section-heading--dark">
+						<p>05 · Full results</p>
+						<div>
+							<h2 id="results-heading">Task generalization across fourteen<br class="section-title-break" />real-world manipulation tasks.</h2>
+							<div class="results-heading-aside">
+								<button class="button" type="button" data-dialog-open="pi05-demo-dialog">Watch Pi-0.5 benchmark</button>
+								<span>Success rates across 14 tasks and five methods, evaluated over 20 real-robot executions for each task–method pair.</span>
+							</div>
+						</div>
+					</header>
+					<figure class="paper-experiment-figure paper-experiment-figure--dark">
+						<button type="button" data-dialog-open="results-figure-dialog" aria-label="Open the full benchmark results figure at full size">
+							<Image src={resultsOriginal} alt="Task generalization success rates across fourteen tasks and five methods" widths={[1200, 2000, 3000]} sizes="(max-width: 960px) 94vw, 88vw" loading="lazy" />
+						</button>
+					</figure>
+					<BenchmarkChart tasks={benchmarkTasks} tableOnly />
+					<div class="figure-actions figure-actions--dark">
+						<p>Comparison with Pi-0.5 and the Code-as-Policies baselines.</p>
+						<div><button class="text-button" type="button" data-dialog-open="results-figure-dialog">Open paper figure ↗</button></div>
+					</div>
+				</div>
+			</section>
+
+			<section class="paper-section more-section" id="more" aria-labelledby="more-heading">
+				<div class="section-shell section-shell--wide">
+					<SectionHeader id="more-heading" eyebrow="06 · More behaviors" title="Additional robot behaviors" titleLine2="beyond the benchmark." description="Additional trials probe open-world placement, geometric tool paths, underspecified language, small objects, and semantic destinations." />
+					<div class="behavior-grid">
+						{moreBehaviors.map((behavior, index) => (
+							<article class:list={['behavior-card', behavior.feature === 'ambiguity' && 'behavior-card--feature']}>
+								<div class="behavior-media">
+									<video muted loop playsinline preload="none" data-lazy-video data-src={behavior.video} data-poster={behavior.poster} aria-label={`${behavior.title} robot behavior`}></video>
+									<noscript><img class="nojs-poster" src={behavior.poster} alt={`${behavior.title} robot behavior`} /></noscript>
+									<button class="task-video-trigger" type="button" data-dialog-open={`more-${behavior.id}-dialog`} aria-label={`Watch ${behavior.title}`}></button>
+									<span>{String(index + 1).padStart(2, '0')}</span>
+								</div>
+								<div class="behavior-copy"><p>{behavior.category}</p><h3>{behavior.title}</h3><span>{behavior.description}</span></div>
+							</article>
+						))}
+					</div>
+					{moreBehaviors.map((behavior) => (
+						<MediaDialog id={`more-${behavior.id}-dialog`} title={behavior.title} description={behavior.description} src={behavior.video} poster={behavior.poster} />
+					))}
+				</div>
+			</section>
+
+			<footer class="site-footer" id="report">
+				<div class="footer-wordmark"><Wordmark /></div>
+				<div class="footer-copy"><p>From high-level language to executable, interpretable, and correctable robot skills.</p></div>
+				<div class="footer-actions">
+					<a class="button button--primary" href="/gta2-initial-report.pdf">Initial Report · PDF</a>
+					<span class="button button--ghost button--disabled" aria-disabled="true">Paper · Coming Soon</span>
+					<span class="button button--ghost button--disabled" aria-disabled="true">Code · Coming Soon</span>
+				</div>
+			</footer>
+		</main>
+
+		<MediaDialog id="gui-demo-dialog" title="Instruction → refinement → revised execution" description="The complete GTA-2 interface sequence, including task decomposition, controller composition, initial execution, targeted user feedback, and revised execution." src="/media/gui-full-demo.mp4" poster="/media/gui-full-demo-poster.jpg" />
+		<MediaDialog id="pi05-demo-dialog" title="Pi-0.5 benchmark executions" description="Benchmark executions for the generalist vision-language-action baseline." src="/media/pi05-benchmark.mp4" poster="/media/pi05-benchmark-poster.jpg" />
+		<ImageLightbox id="method-figure-dialog" title="GTA-2 system architecture" src={methodArchitecture} alt="Original GTA-2 architecture figure showing four VLM agents and robot execution" />
+		<ImageLightbox id="feedback-figure-dialog" title="Targeted feedback progression" src={feedbackOriginal} alt="Original targeted feedback progression graph from the GTA-2 report" />
+		<ImageLightbox id="results-figure-dialog" title="Full benchmark results" src={resultsOriginal} alt="Original benchmark success rate graph across fourteen tasks and five methods" />
+
+		<script>
+			const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+			const heroVideo = document.querySelector<HTMLVideoElement>('[data-hero-video]');
+			if (reducedMotion && heroVideo) heroVideo.pause();
+
+			const heroShell = document.querySelector<HTMLElement>('.hero-shell');
+			const heroLogo = heroShell?.querySelector<HTMLElement>('.wordmark');
+			const heroTitle = heroShell?.querySelector<HTMLElement>('.hero-copy h1');
+			const heroMedia = heroShell?.querySelector<HTMLElement>('.hero-media');
+			const heroActions = heroShell?.querySelector<HTMLElement>('.hero-media-actions');
+			if (heroShell && heroLogo && heroTitle && heroMedia && heroActions) {
+				const alignHeroMedia = () => {
+					if (window.innerWidth <= 960) {
+						heroShell.removeAttribute('data-hero-aligned');
+						heroLogo.style.removeProperty('width');
+						heroMedia.style.removeProperty('--hero-media-offset');
+						heroMedia.style.removeProperty('--hero-frame-height');
+						return;
+					}
+
+					const shellRect = heroShell.getBoundingClientRect();
+					const logoRect = heroLogo.getBoundingClientRect();
+					const copyRect = heroLogo.parentElement?.getBoundingClientRect();
+					const titleRange = document.createRange();
+					titleRange.selectNodeContents(heroTitle);
+					const titleInkRect = titleRange.getBoundingClientRect();
+					const wordmarkWidth = Math.max(copyRect?.width ?? 0, titleInkRect.right - logoRect.left);
+					if (Math.abs(logoRect.width - wordmarkWidth) > .5) {
+						heroLogo.style.width = `${wordmarkWidth}px`;
+						requestAnimationFrame(alignHeroMedia);
+						return;
+					}
+					const titleRect = heroTitle.getBoundingClientRect();
+					const actionsRect = heroActions.getBoundingClientRect();
+					const actionsMargin = Number.parseFloat(getComputedStyle(heroActions).marginBottom) || 0;
+					const mediaOffset = logoRect.top - shellRect.top;
+					const frameHeight = titleRect.bottom - logoRect.top - actionsRect.height - actionsMargin;
+
+					heroMedia.style.setProperty('--hero-media-offset', `${mediaOffset}px`);
+					heroMedia.style.setProperty('--hero-frame-height', `${Math.max(frameHeight, 240)}px`);
+					heroShell.setAttribute('data-hero-aligned', '');
+				};
+
+				const heroResizeObserver = new ResizeObserver(alignHeroMedia);
+				[heroShell, heroLogo, heroTitle, heroActions].forEach((element) => heroResizeObserver.observe(element));
+				window.addEventListener('resize', alignHeroMedia, { passive: true });
+				document.fonts.ready.then(alignHeroMedia);
+				alignHeroMedia();
+			}
+
+			document.querySelectorAll<HTMLAnchorElement>('.mobile-nav a').forEach((link) => link.addEventListener('click', () => link.closest('details')?.removeAttribute('open')));
+
+			const lazyVideos = document.querySelectorAll<HTMLVideoElement>('[data-lazy-video]');
+			const videoObserver = new IntersectionObserver((entries) => {
+				entries.forEach((entry) => {
+					const video = entry.target as HTMLVideoElement;
+					if (entry.isIntersecting && !video.src && video.dataset.src) {
+						if (video.dataset.poster) video.poster = video.dataset.poster;
+						video.src = video.dataset.src;
+						video.load();
+					}
+					if (!reducedMotion && entry.intersectionRatio >= .55) video.play().catch(() => undefined);
+					else video.pause();
+				});
+			}, { rootMargin: '300px 0px', threshold: [0, .55] });
+			lazyVideos.forEach((video) => videoObserver.observe(video));
+
+			document.querySelectorAll<HTMLElement>('[data-filmstrip]').forEach((filmstrip) => {
+				const rail = filmstrip.querySelector<HTMLElement>('[data-filmstrip-rail]');
+				if (!rail) return;
+				const move = (direction: number) => rail.scrollBy({ left: direction * Math.min(rail.clientWidth * .82, 760), behavior: reducedMotion ? 'auto' : 'smooth' });
+				filmstrip.querySelector('[data-filmstrip-prev]')?.addEventListener('click', () => move(-1));
+				filmstrip.querySelector('[data-filmstrip-next]')?.addEventListener('click', () => move(1));
+				let dragStart = 0;
+				let scrollStart = 0;
+				let dragging = false;
+				rail.addEventListener('pointerdown', (event) => {
+					if ((event.target as HTMLElement).closest('video')) event.preventDefault();
+					dragging = true;
+				dragStart = event.clientX;
+				scrollStart = rail.scrollLeft;
+			});
+			rail.addEventListener('pointermove', (event) => {
+				if (!dragging) return;
+				const distance = event.clientX - dragStart;
+				if (Math.abs(distance) < 6) return;
+				if (!rail.hasPointerCapture(event.pointerId)) rail.setPointerCapture(event.pointerId);
+				rail.classList.add('is-dragging');
+				rail.scrollLeft = scrollStart - distance;
+			});
+				const stopDrag = (event: PointerEvent) => {
+					if (!dragging) return;
+					dragging = false;
+					rail.classList.remove('is-dragging');
+					if (rail.hasPointerCapture(event.pointerId)) rail.releasePointerCapture(event.pointerId);
+				};
+				rail.addEventListener('pointerup', stopDrag);
+				rail.addEventListener('pointercancel', stopDrag);
+			});
+
+			let dialogOpener: HTMLElement | null = null;
+			document.querySelectorAll<HTMLElement>('[data-dialog-open]').forEach((button) => {
+				button.addEventListener('click', () => {
+					const dialog = document.getElementById(button.dataset.dialogOpen ?? '') as HTMLDialogElement | null;
+					if (!dialog) return;
+					dialogOpener = button;
+					dialog.showModal();
+					const video = dialog.querySelector<HTMLVideoElement>('[data-dialog-video]');
+					if (video?.dataset.src && !video.src) { if (video.dataset.poster) video.poster = video.dataset.poster; video.src = video.dataset.src; video.load(); }
+					video?.play().catch(() => undefined);
+				});
+			});
+			document.querySelectorAll<HTMLDialogElement>('[data-media-dialog]').forEach((dialog) => {
+				dialog.querySelector('[data-dialog-close]')?.addEventListener('click', () => dialog.close());
+				dialog.addEventListener('click', (event) => { if (event.target === dialog) dialog.close(); });
+				dialog.addEventListener('close', () => {
+					const video = dialog.querySelector<HTMLVideoElement>('[data-dialog-video]');
+					if (video) { video.pause(); video.removeAttribute('src'); video.removeAttribute('poster'); video.load(); }
+					dialogOpener?.focus();
+					dialogOpener = null;
+				});
+			});
+
+			const methodFlow = document.querySelector<HTMLElement>('[data-method-flow]');
+			const methodStepNodes = document.querySelectorAll<HTMLElement>('[data-method-step]');
+			if (methodFlow && methodStepNodes.length) {
+				const activateMethodStep = (id: string) => {
+					methodFlow.dataset.active = id;
+					methodStepNodes.forEach((step) => step.classList.toggle('is-active', step.dataset.methodStep === id));
+					methodFlow.querySelectorAll<HTMLElement>('[data-method-node]').forEach((node) => node.classList.toggle('is-active', node.dataset.methodNode === id));
+				};
+				methodFlow.querySelectorAll<HTMLButtonElement>('[data-method-jump]').forEach((button) => {
+					button.addEventListener('click', () => {
+						const id = button.dataset.methodJump ?? '';
+						const step = methodFlow.querySelector<HTMLElement>(`[data-method-step="${id}"]`);
+						if (!step) return;
+						activateMethodStep(id);
+						step.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' });
+					});
+				});
+				activateMethodStep(methodStepNodes[0]?.dataset.methodStep ?? 'instruction');
+				const methodObserver = new IntersectionObserver((entries) => {
+					entries.filter((entry) => entry.isIntersecting).forEach((entry) => activateMethodStep((entry.target as HTMLElement).dataset.methodStep ?? 'instruction'));
+				}, { rootMargin: '-35% 0px -45% 0px', threshold: 0 });
+				methodStepNodes.forEach((step) => methodObserver.observe(step));
+			}
+		</script>
+	</body>
+</html>

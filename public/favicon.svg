@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="GTA-2">
+  <rect width="128" height="128" rx="24" fill="#0a0b0e"/>
+  <path d="M22 26h56v18H42v40h36V63H56V48h43v55H22z" fill="#f3f1eb"/>
+  <rect x="88" y="23" width="8" height="26" rx="1" fill="#c4142d"/>
+  <rect x="101" y="23" width="8" height="26" rx="1" fill="#c4142d"/>
+</svg>

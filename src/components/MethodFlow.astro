@@ -1,0 +1,105 @@
+---
+import { Image } from 'astro:assets';
+import methodArchitecture from '../assets/method-architecture.png';
+import type { MethodStep } from '../data/site';
+
+interface Props { steps: MethodStep[]; }
+const { steps } = Astro.props;
+---
+
+<div class="method-flow" data-method-flow data-active="instruction">
+	<div class="method-stage-wrap">
+		<div class="method-stage">
+			<div class="stage-grid"></div>
+			<div class="stage-input" data-method-node="instruction">
+				<button class="stage-input-trigger" type="button" data-method-jump="instruction" aria-label="Show task prompt and scene input details"></button>
+				<div class="stage-input-layout">
+					<div class="stage-figure-crop stage-figure-crop--input"><Image src={methodArchitecture} alt="" width={2554} loading="lazy" /></div>
+					<div class="stage-input-copy"><span>Task prompt</span><strong>put the bottle into the box</strong><small>RGB-D scene · controller library</small></div>
+				</div>
+			</div>
+			<div class="stage-line stage-line--top"></div>
+			<div class="stage-agents">
+				<button type="button" class="stage-agent agent-task" data-method-node="decomposer" data-method-jump="decomposer" aria-label="Show Task Decomposer details"><i>01</i><span>Task<br/>Decomposer</span><small>6 subtasks</small></button>
+				<button type="button" class="stage-agent agent-skill" data-method-node="generator" data-method-jump="generator" aria-label="Show Skill Generator details"><i>02</i><span>Skill<br/>Generator</span><small>4 controllers</small></button>
+				<button type="button" class="stage-agent agent-parameter" data-method-node="parameters" data-method-jump="parameters" aria-label="Show Parameter Setter details"><i>03</i><span>Parameter<br/>Setter</span><small>4 values</small></button>
+				<button type="button" class="stage-agent agent-vision" data-method-node="grounding" data-method-jump="grounding" aria-label="Show Vision Grounder details"><i>04</i><span>Vision<br/>Grounder</span><small>6 groundings</small></button>
+			</div>
+			<div class="stage-line stage-line--bottom"></div>
+			<div class="stage-composition stage-generated-output" data-method-node="execution">
+				<button class="stage-generated-trigger" type="button" data-method-jump="execution" aria-label="Show generated skill compilation and robot execution details"></button>
+				<small>Generated skill</small>
+				<div class="stage-subtasks">
+					<div class="stage-subtask"><i>01</i><span>Approach bottle for pre-grasp</span><b>+</b></div>
+					<div class="stage-subtask"><i>02</i><span>Grasp the bottle</span><b>+</b></div>
+					<div class="stage-subtask"><i>03</i><span>Lift the bottle up</span><b>+</b></div>
+					<div class="stage-subtask stage-subtask--active">
+						<header><i>04</i><span>Move over the box</span><b>−</b></header>
+						<div class="stage-controller-recipe">
+							<code><i>1</i><span>PosAlign(bottle_cap, box_inside, o_z = 0.15 m)</span></code>
+							<code><i>2</i><span>PosAlign(bottle_cap, box_inside, o_y = 0.00 m)</span></code>
+							<code><i>3</i><span>PosAlign(bottle_cap, box_inside, o_x = 0.00 m)</span></code>
+							<code><i>4</i><span>AxisAlign(eef_z, box_inside_norm, o_θ = 180°)</span></code>
+						</div>
+						<div class="stage-component-signature"><span>P<sub>target</sub></span><b>+</b><span>R<sub>axis</sub></span><b>+</b><span>F<sub>contact</sub></span><b>+</b><span>G<sub>state</sub></span></div>
+					</div>
+					<div class="stage-subtask"><i>05</i><span>Place down the bottle</span><b>+</b></div>
+					<div class="stage-subtask"><i>06</i><span>Release and retract</span><b>+</b></div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="method-steps">
+		{steps.map((step) => (
+			<article class="method-step" data-method-step={step.id} data-color={step.color}>
+				<div class="method-step-index">{step.index}</div>
+				<p>{step.agent}</p>
+				<h3>{step.title}</h3>
+				<div class="method-step-rule"></div>
+				<span>{step.description}</span>
+				{step.id === 'generator' ? (
+					<>
+						<dl><div><dt>Input</dt><dd>{step.input}</dd></div></dl>
+						<figure class="method-step-video">
+							<figcaption>Task-axis controllers in execution</figcaption>
+							<video controls muted playsinline loop preload="none" data-lazy-video data-src="/media/controllers.mp4" data-poster="/media/controllers-poster.jpg" aria-label="Task-axis controllers in execution"></video>
+						</figure>
+						<dl class="method-output-summary"><div><dt>Output</dt><dd>{step.output}</dd></div></dl>
+					</>
+				) : (
+					<dl><div><dt>Input</dt><dd>{step.input}</dd></div><div><dt>Output</dt><dd>{step.output}</dd></div></dl>
+				)}
+				{step.id === 'grounding' && step.outputGroups ? (
+					<div class="method-grounding-output">
+						<figure class="method-grounding-image">
+							<figcaption>Output · 3D Groundings</figcaption>
+							<div class="stage-figure-crop stage-figure-crop--vision"><Image src={methodArchitecture} alt="Bottle and box scene with grounded keypoints and task axes" width={2554} loading="lazy" /></div>
+						</figure>
+						<div class="method-output-groups" aria-label={`${step.agent} example output`}>
+							{step.outputGroups.map((group) => (
+								<section>
+									<h4>{group.label}</h4>
+									<ul class:list={{ 'method-output-code': group.code }}>{group.items.map((item) => <li>{item}</li>)}</ul>
+								</section>
+							))}
+						</div>
+					</div>
+				) : step.outputGroups && (
+					<div class="method-output-groups" aria-label={`${step.agent} example output`}>
+						{step.outputGroups.map((group) => (
+							<section>
+								<h4>{group.label}</h4>
+								{group.ordered ? (
+									<ol class:list={{ 'method-output-code': group.code }}>{group.items.map((item) => <li>{item}</li>)}</ol>
+								) : (
+									<ul class:list={{ 'method-output-code': group.code }}>{group.items.map((item) => <li>{item}</li>)}</ul>
+								)}
+							</section>
+						))}
+					</div>
+				)}
+			</article>
+		))}
+	</div>
+</div>

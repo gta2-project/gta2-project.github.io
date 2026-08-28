@@ -1,0 +1,21 @@
+---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+	id: string;
+	title: string;
+	src: ImageMetadata;
+	alt: string;
+	width?: number;
+}
+
+const { id, title, src, alt, width = 3000 } = Astro.props;
+---
+
+<dialog class="image-dialog" id={id} data-media-dialog>
+	<div class="image-dialog-shell">
+		<header><h2>{title}</h2><button type="button" data-dialog-close aria-label={`Close ${title}`}>Close</button></header>
+		<div class="image-dialog-scroll"><Image src={src} alt={alt} width={width} loading="lazy" /></div>
+	</div>
+</dialog>

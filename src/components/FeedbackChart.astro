@@ -1,0 +1,33 @@
+---
+import { agentLegend, type FeedbackProgression, type AgentKey } from '../data/site';
+
+interface Props { tasks: FeedbackProgression[]; }
+const { tasks } = Astro.props;
+const agentKeys: AgentKey[] = ['task', 'skill', 'parameter', 'vision'];
+---
+
+<div class="feedback-legend" aria-label="Feedback type legend">
+	<span class="legend-success"><i></i>Success</span>
+	{agentLegend.map((agent) => <span class={`legend-${agent.key}`}><i></i>{agent.short} · {agent.label}</span>)}
+</div>
+
+<div class="feedback-grid">
+	{tasks.map((task) => (
+		<article class="feedback-card">
+			<h3>{task.title}</h3>
+			<div class="feedback-rounds" role="img" aria-label={`${task.title} feedback progression across ${task.rounds.length} rounds`}>
+				{task.rounds.map((round) => (
+					<div class="feedback-round">
+						<div class="feedback-stack">
+							<span class="feedback-success" style={`height:${round.success / 15 * 100}%`}><b>{round.success}/15</b></span>
+							{agentKeys.map((key) => round.feedback[key] > 0 && (
+								<span class={`feedback-${key}`} style={`height:${round.feedback[key] / 15 * 100}%`} title={`${round.feedback[key]} ${agentLegend.find((item) => item.key === key)?.label}`}><b>{round.feedback[key]} {agentLegend.find((item) => item.key === key)?.short}</b></span>
+							))}
+						</div>
+						<small>{round.label}</small>
+					</div>
+				))}
+			</div>
+		</article>
+	))}
+</div>

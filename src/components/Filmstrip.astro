@@ -1,0 +1,43 @@
+---
+import MediaDialog from './MediaDialog.astro';
+import type { TaskDemo } from '../data/site';
+
+interface Props { tasks: TaskDemo[]; }
+const { tasks } = Astro.props;
+---
+
+<div class="filmstrip" data-filmstrip>
+	<div class="filmstrip-controls">
+		<p><span>{String(tasks.length).padStart(2, '0')}</span> generated-plan comparisons</p>
+		<div>
+			<button type="button" data-filmstrip-prev aria-label="Scroll tasks left">←</button>
+			<button type="button" data-filmstrip-next aria-label="Scroll tasks right">→</button>
+		</div>
+	</div>
+	<ul class="filmstrip-rail" data-filmstrip-rail aria-label="GTA-2 task execution videos">
+		{tasks.map((task, index) => (
+			<li>
+				<article class="task-card">
+					<div class="task-card-media">
+						<video muted loop playsinline preload="none" data-lazy-video data-src={task.video} data-poster={task.poster} aria-label={`Four generated plans for ${task.title}`}></video>
+						<noscript><img class="nojs-poster" src={task.poster} alt={`Four generated plans for ${task.title}`} /></noscript>
+						<button class="task-video-trigger" type="button" data-dialog-open={`task-${task.id}-dialog`} aria-label={`Watch ${task.title}`}></button>
+					</div>
+					<div class="task-card-copy">
+						<p>{String(index + 1).padStart(2, '0')} · {task.category}</p>
+						<h3>{task.title}</h3>
+					</div>
+				</article>
+			</li>
+		))}
+	</ul>
+	{tasks.map((task) => (
+		<MediaDialog
+			id={`task-${task.id}-dialog`}
+			title={task.title}
+			description={task.category}
+			src={task.video}
+			poster={task.poster}
+		/>
+	))}
+</div>

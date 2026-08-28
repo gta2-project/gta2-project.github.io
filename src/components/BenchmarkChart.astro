@@ -1,0 +1,41 @@
+---
+import { benchmarkMethods, type BenchmarkTask } from '../data/site';
+
+interface Props { tasks: BenchmarkTask[]; tableOnly?: boolean; }
+const { tasks, tableOnly = false } = Astro.props;
+---
+
+{!tableOnly && (
+	<>
+		<div class="benchmark-legend" aria-label="Benchmark method legend">
+			{benchmarkMethods.map((method) => <span class={`benchmark-${method.key}`}><i></i>{method.label}</span>)}
+		</div>
+
+		<div class="benchmark-grid">
+			{tasks.map((task) => (
+				<article class="benchmark-card" role="img" aria-label={`${task.title}: ${benchmarkMethods.map((method) => `${method.label} ${task.values[method.key]} percent`).join(', ')}`}>
+					<header><h3>{task.title}</h3></header>
+					<div class="benchmark-plot">
+						<div class="benchmark-gridlines"><i></i><i></i><i></i><i></i></div>
+						{benchmarkMethods.map((method) => (
+							<div class={`benchmark-bar benchmark-${method.key}`} style={`--value:${task.values[method.key]}%`}>
+								<b>{task.values[method.key]}%</b><i></i><small>{method.label}</small>
+							</div>
+						))}
+					</div>
+				</article>
+			))}
+		</div>
+	</>
+)}
+
+<details class="data-table-details">
+	<summary>Open accessible results table</summary>
+	<div class="table-scroll">
+		<table>
+			<caption>Success rate by task and method, evaluated over 20 physical executions per task and method.</caption>
+			<thead><tr><th scope="col">Task</th>{benchmarkMethods.map((method) => <th scope="col">{method.label}</th>)}</tr></thead>
+			<tbody>{tasks.map((task) => <tr><th scope="row">{task.title}</th>{benchmarkMethods.map((method) => <td>{task.values[method.key]}%</td>)}</tr>)}</tbody>
+		</table>
+	</div>
+</details>
