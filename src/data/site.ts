@@ -68,6 +68,10 @@ export const taskDemos: TaskDemo[] = [
 	{ id: 'obstacle', title: 'Put the Ball into the Basket (There Is a Wall Obstacle in Between)', category: 'Basic pick and place for VLA', video: '/media/task-obstacle.mp4', poster: '/media/task-obstacle-poster.jpg' },
 	{ id: 'fruits', title: 'Put the Fruits into the White Bowl / Put the Others into the Pink Container', category: 'Clutter cleanup and multi-object organization', video: '/media/task-fruits.mp4', poster: '/media/task-fruits-poster.jpg' },
 	{ id: 'typo', title: 'Fix the Typo', category: 'Semantic reasoning and ordering', video: '/media/task-typo.mp4', poster: '/media/task-typo-poster.jpg' },
+	{ id: 'ball', title: 'Put the Ball into the Basket', category: 'Basic pick and place for VLA', video: '/media/task-ball.mp4', poster: '/media/task-ball-poster.jpg' },
+	{ id: 'cube', title: 'Put the Cube into the Drawer', category: 'Basic pick and place for VLA', video: '/media/task-cube.mp4', poster: '/media/task-cube-poster.jpg' },
+	{ id: 'iron', title: 'Iron the Tie', category: 'Contact-rich surface interaction and coverage', video: '/media/task-iron.mp4', poster: '/media/task-iron-poster.jpg' },
+	{ id: 'drawer', title: 'Close the Drawer', category: 'Articulated objects and appliances', video: '/media/task-drawer.mp4', poster: '/media/task-drawer-poster.jpg' },
 ];
 
 export const methodSteps: MethodStep[] = [

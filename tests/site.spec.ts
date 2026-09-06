@@ -38,7 +38,9 @@ test('exposes all tasks, source figures, methods, and values', async ({ page }) 
 	await page.goto('/');
 	await expect(page.locator('.paper-experiment-figure--light')).toHaveCount(1);
 	await expect(page.locator('.paper-experiment-figure--dark')).toHaveCount(1);
-	await expect(page.locator('.task-card')).toHaveCount(10);
+	await expect(page.locator('.task-card')).toHaveCount(14);
+	await expect(page.locator('dialog[id^="task-"]')).toHaveCount(14);
+	await expect(page.getByText('14 generated-plan comparisons')).toBeVisible();
 	await expect(page.locator('.behavior-card')).toHaveCount(5);
 
 	const rows = page.locator('.data-table-details tbody tr');
@@ -117,7 +119,16 @@ test('reduced motion stops autoplay and the no-JS page retains its content', asy
 });
 
 test('initial report and core media assets resolve', async ({ request }) => {
-	for (const path of ['/gta2-initial-report.pdf', '/media/gta2-hero-poster.jpg', '/media/gta2-hero-cut.mp4']) {
+	for (const path of [
+		'/gta2-initial-report.pdf',
+		'/media/gta2-hero-poster.jpg',
+		'/media/gta2-hero-cut.mp4',
+		'/media/task-ball.mp4',
+		'/media/task-cube.mp4',
+		'/media/task-iron.mp4',
+		'/media/task-drawer.mp4',
+		'/media/more-phone-call.mp4',
+	]) {
 		const response = await request.get(path, { headers: { Range: 'bytes=0-1023' } });
 		expect(response.ok(), path).toBe(true);
 	}
