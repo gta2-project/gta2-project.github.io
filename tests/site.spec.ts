@@ -108,6 +108,7 @@ test('reduced motion stops autoplay and the no-JS page retains its content', asy
 	await page.emulateMedia({ reducedMotion: 'reduce' });
 	await page.goto('/');
 	await expect.poll(() => page.locator('[data-hero-video]').evaluate((video: HTMLVideoElement) => video.paused)).toBe(true);
+	await expect(page.getByRole('button', { name: 'Play teaser' })).toBeVisible();
 
 	const noJs = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
 	const noJsPage = await noJs.newPage();
@@ -116,6 +117,22 @@ test('reduced motion stops autoplay and the no-JS page retains its content', asy
 	await expect(noJsPage.locator('[data-hero-video]')).toHaveAttribute('poster', '/media/gta2-hero-poster.jpg');
 	await expect(noJsPage.getByText('Read the full abstract')).toBeVisible();
 	await noJs.close();
+});
+
+test('offers manual teaser playback when autoplay is blocked', async ({ page, browserName }) => {
+	test.skip(browserName !== 'chromium', 'Autoplay fallback behavior is browser-independent.');
+	await page.addInitScript(() => {
+		HTMLMediaElement.prototype.play = () => Promise.reject(new DOMException('Autoplay blocked', 'NotAllowedError'));
+	});
+	await page.goto('/');
+	const playButton = page.getByRole('button', { name: 'Play teaser' });
+	await expect(playButton).toBeVisible();
+
+	await page.evaluate(() => {
+		HTMLMediaElement.prototype.play = () => Promise.resolve();
+	});
+	await playButton.click();
+	await expect(playButton).toBeHidden();
 });
 
 test('initial report and core media assets resolve', async ({ request }) => {

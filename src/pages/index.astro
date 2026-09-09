@@ -78,6 +78,7 @@ const fullAbstract = 'Robotic manipulation tasks are often decomposed into reusa
 						<div class="hero-frame">
 							<button class="hero-frame-trigger" type="button" data-dialog-open="gui-demo-dialog" aria-label="Watch the full GTA-2 demo"></button>
 							<button class="media-status" type="button" data-dialog-open="gui-demo-dialog"><i></i> Watch the Full Demo</button>
+							<button class="hero-teaser-play" type="button" data-hero-play hidden><i></i> Play teaser</button>
 							<video muted playsinline loop autoplay preload="metadata" poster="/media/gta2-hero-poster.jpg" data-hero-video aria-label="A short GTA-2 demo showing task generation, robot execution, feedback, and revised execution">
 								<source src="/media/gta2-hero-cut.mp4" type="video/mp4" />
 							</video>
@@ -217,7 +218,46 @@ const fullAbstract = 'Robotic manipulation tasks are often decomposed into reusa
 		<script>
 			const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 			const heroVideo = document.querySelector<HTMLVideoElement>('[data-hero-video]');
-			if (reducedMotion && heroVideo) heroVideo.pause();
+			const heroPlayButton = document.querySelector<HTMLButtonElement>('[data-hero-play]');
+			if (heroVideo && heroPlayButton) {
+				// Some Windows/Edge configurations ignore the autoplay attribute even for
+				// muted media. Set the matching DOM properties before explicitly trying.
+				heroVideo.muted = true;
+				heroVideo.defaultMuted = true;
+				heroVideo.playsInline = true;
+
+				const showHeroPlayButton = () => { heroPlayButton.hidden = false; };
+				const hideHeroPlayButton = () => { heroPlayButton.hidden = true; };
+				const tryHeroAutoplay = async () => {
+					if (reducedMotion) {
+						heroVideo.pause();
+						showHeroPlayButton();
+						return;
+					}
+
+					try {
+						await heroVideo.play();
+						hideHeroPlayButton();
+					} catch {
+						showHeroPlayButton();
+					}
+				};
+
+				heroPlayButton.addEventListener('click', async () => {
+					try {
+						await heroVideo.play();
+						hideHeroPlayButton();
+					} catch {
+						showHeroPlayButton();
+					}
+				});
+				heroVideo.addEventListener('playing', hideHeroPlayButton);
+				window.addEventListener('pageshow', () => { void tryHeroAutoplay(); });
+				document.addEventListener('visibilitychange', () => {
+					if (!document.hidden && heroVideo.paused) void tryHeroAutoplay();
+				});
+				void tryHeroAutoplay();
+			}
 
 			const heroShell = document.querySelector<HTMLElement>('.hero-shell');
 			const heroLogo = heroShell?.querySelector<HTMLElement>('.wordmark');
