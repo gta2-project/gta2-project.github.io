@@ -135,9 +135,16 @@ test('offers manual teaser playback when autoplay is blocked', async ({ page, br
 	await expect(playButton).toBeHidden();
 });
 
-test('initial report and core media assets resolve', async ({ request }) => {
+test('arXiv paper links and core media assets resolve', async ({ page, request }) => {
+	await page.goto('/');
+	const paperLinks = page.getByRole('link', { name: 'Paper · arXiv' });
+	await expect(paperLinks).toHaveCount(2);
+	for (const link of await paperLinks.all()) {
+		await expect(link).toHaveAttribute('href', 'https://arxiv.org/abs/2609.09808');
+	}
+	await expect(page.getByText('Initial Report · PDF')).toHaveCount(0);
+
 	for (const path of [
-		'/gta2-initial-report.pdf',
 		'/media/gta2-hero-poster.jpg',
 		'/media/gta2-hero-cut.mp4',
 		'/media/task-ball.mp4',
@@ -149,4 +156,7 @@ test('initial report and core media assets resolve', async ({ request }) => {
 		const response = await request.get(path, { headers: { Range: 'bytes=0-1023' } });
 		expect(response.ok(), path).toBe(true);
 	}
+
+	const supersededReport = await request.get('/gta2-initial-report.pdf');
+	expect(supersededReport.status()).toBe(404);
 });
