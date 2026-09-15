@@ -11,6 +11,9 @@ import methodArchitecture from '../assets/method-architecture.png';
 import taskPanorama from '../assets/task-panorama.png';
 import feedbackOriginal from '../assets/feedback-original.png';
 import resultsOriginal from '../assets/results-original.png';
+import iamLabLogo from '../assets/affiliations/iam-lab.png';
+import cmuLogo from '../assets/affiliations/cmu.png';
+import boschLogo from '../assets/affiliations/bosch.webp';
 import { benchmarkTasks, methodSteps, moreBehaviors, taskDemos } from '../data/site';
 import '../styles/global.css';
 
@@ -65,6 +68,15 @@ const fullAbstract = 'Robotic manipulation tasks are often decomposed into reusa
 					<div class="hero-copy">
 						<p class="eyebrow">Grounded Task Axes · Version 2</p>
 						<Wordmark />
+						<div class="hero-credits">
+							<div class="hero-authors" aria-label="Authors">
+								<a href="https://myunusseker.github.io/" target="_blank" rel="noopener">M. Yunus Seker</a>
+								<a href="https://engineering.cmu.edu/mfi/directory/bios/aggarwal-shobhit.html" target="_blank" rel="noopener">Shobhit Aggarwal</a>
+								<a href="https://ruwantw.github.io/" target="_blank" rel="noopener">Ruwan Wickramarachchi</a>
+								<a href="https://jonfranc.com/" target="_blank" rel="noopener">Jonathan Francis</a>
+								<a href="https://www.ri.cmu.edu/ri-faculty/oliver-kroemer/" target="_blank" rel="noopener">Oliver Kroemer</a>
+							</div>
+						</div>
 						<h1 id="hero-title">From Language to Manipulation: <em>Composing Object-Centric Skills from Scratch.</em></h1>
 						<p class="hero-lede"><strong>GTA-2 turns high-level language instructions into executable, interpretable, and correctable robot manipulation skills</strong> through task-axis controller compositions—zero-shot, without task-specific demonstrations or training.</p>
 					</div>
@@ -84,6 +96,20 @@ const fullAbstract = 'Robotic manipulation tasks are often decomposed into reusa
 						</div>
 						<div class="hero-sequence" aria-hidden="true">
 							<span>Instruction</span><b></b><span>Composition</span><b></b><span>Execution</span><b></b><span>Refinement</span>
+						</div>
+						<div class="hero-affiliations" aria-label="Laboratory and affiliations">
+							<a class="hero-affiliation hero-affiliation--iam" href="https://iamlab-cmu.github.io/" target="_blank" rel="noopener" aria-label="Intelligent Autonomous Manipulation Lab">
+								<span class="hero-affiliation__image"><Image src={iamLabLogo} alt="" widths={[160, 320]} sizes="160px" /></span>
+								<span class="hero-affiliation__label">Intelligent Autonomous Manipulation Lab</span>
+							</a>
+							<a class="hero-affiliation hero-affiliation--cmu" href="https://www.cmu.edu/" target="_blank" rel="noopener" aria-label="Carnegie Mellon University">
+								<span class="hero-affiliation__image"><Image src={cmuLogo} alt="" widths={[160, 320]} sizes="160px" /></span>
+								<span class="hero-affiliation__label">Carnegie Mellon University</span>
+							</a>
+							<a class="hero-affiliation hero-affiliation--bosch" href="https://www.bosch.com/research/bcai/" target="_blank" rel="noopener" aria-label="Bosch Center for Artificial Intelligence">
+								<span class="hero-affiliation__image"><Image src={boschLogo} alt="" widths={[160, 260]} sizes="160px" /></span>
+								<span class="hero-affiliation__label">Bosch Center for Artificial Intelligence</span>
+							</a>
 						</div>
 					</div>
 				</div>
@@ -261,14 +287,12 @@ const fullAbstract = 'Robotic manipulation tasks are often decomposed into reusa
 			const heroLogo = heroShell?.querySelector<HTMLElement>('.wordmark');
 			const heroTitle = heroShell?.querySelector<HTMLElement>('.hero-copy h1');
 			const heroMedia = heroShell?.querySelector<HTMLElement>('.hero-media');
-			const heroActions = heroShell?.querySelector<HTMLElement>('.hero-media-actions');
-			if (heroShell && heroLogo && heroTitle && heroMedia && heroActions) {
+			if (heroShell && heroLogo && heroTitle && heroMedia) {
 				const alignHeroMedia = () => {
 					if (window.innerWidth <= 960) {
 						heroShell.removeAttribute('data-hero-aligned');
 						heroLogo.style.removeProperty('width');
 						heroMedia.style.removeProperty('--hero-media-offset');
-						heroMedia.style.removeProperty('--hero-frame-height');
 						return;
 					}
 
@@ -284,19 +308,14 @@ const fullAbstract = 'Robotic manipulation tasks are often decomposed into reusa
 						requestAnimationFrame(alignHeroMedia);
 						return;
 					}
-					const titleRect = heroTitle.getBoundingClientRect();
-					const actionsRect = heroActions.getBoundingClientRect();
-					const actionsMargin = Number.parseFloat(getComputedStyle(heroActions).marginBottom) || 0;
 					const mediaOffset = logoRect.top - shellRect.top;
-					const frameHeight = titleRect.bottom - logoRect.top - actionsRect.height - actionsMargin;
 
 					heroMedia.style.setProperty('--hero-media-offset', `${mediaOffset}px`);
-					heroMedia.style.setProperty('--hero-frame-height', `${Math.max(frameHeight, 240)}px`);
 					heroShell.setAttribute('data-hero-aligned', '');
 				};
 
 				const heroResizeObserver = new ResizeObserver(alignHeroMedia);
-				[heroShell, heroLogo, heroTitle, heroActions].forEach((element) => heroResizeObserver.observe(element));
+				[heroShell, heroLogo, heroTitle].forEach((element) => heroResizeObserver.observe(element));
 				window.addEventListener('resize', alignHeroMedia, { passive: true });
 				document.fonts.ready.then(alignHeroMedia);
 				alignHeroMedia();

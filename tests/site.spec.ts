@@ -42,6 +42,11 @@ test('exposes all tasks, source figures, methods, and values', async ({ page }) 
 	await expect(page.locator('dialog[id^="task-"]')).toHaveCount(14);
 	await expect(page.getByText('14 generated-plan comparisons')).toBeVisible();
 	await expect(page.locator('.behavior-card')).toHaveCount(5);
+	await expect(page.locator('.hero-authors a')).toHaveCount(5);
+	await expect(page.locator('.hero-affiliations a')).toHaveCount(3);
+	await expect(page.getByRole('link', { name: 'Intelligent Autonomous Manipulation Lab' })).toHaveAttribute('href', 'https://iamlab-cmu.github.io/');
+	await expect(page.getByRole('link', { name: 'Carnegie Mellon University' })).toHaveAttribute('href', 'https://www.cmu.edu/');
+	await expect(page.getByRole('link', { name: 'Bosch Center for Artificial Intelligence' })).toHaveAttribute('href', 'https://www.bosch.com/research/bcai/');
 
 	const rows = page.locator('.data-table-details tbody tr');
 	await expect(rows).toHaveCount(14);
