@@ -16,7 +16,11 @@ const benchmarkValues = [
 ];
 
 test.beforeEach(async ({ page }) => {
-	await page.route('**/*.mp4', (route) => route.abort());
+	await page.route('**/*', (route) => {
+		const url = new URL(route.request().url());
+		if (url.hostname !== '127.0.0.1' || url.pathname.endsWith('.mp4')) return route.abort();
+		return route.continue();
+	});
 });
 
 test('renders without console errors or horizontal page overflow', async ({ page }) => {
@@ -77,8 +81,8 @@ test('mobile navigation exposes every primary section', async ({ page }) => {
 	await page.goto('/');
 	await page.locator('.mobile-nav summary').click();
 	const links = page.locator('.mobile-nav nav a');
-	await expect(links).toHaveCount(4);
-	await expect(links).toHaveText(['Tasks', 'Method', 'Results', 'More']);
+	await expect(links).toHaveCount(5);
+	await expect(links).toHaveText(['Tasks', 'Method', 'Results', 'More', 'Documentation']);
 	await links.first().click();
 	await expect(page.locator('.mobile-nav')).not.toHaveAttribute('open', '');
 });
@@ -116,6 +120,7 @@ test('reduced motion stops autoplay and the no-JS page retains its content', asy
 	await expect(page.getByRole('button', { name: 'Play teaser' })).toBeVisible();
 
 	const noJs = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
+	await noJs.route('**/*', (route) => new URL(route.request().url()).hostname === '127.0.0.1' ? route.continue() : route.abort());
 	const noJsPage = await noJs.newPage();
 	await noJsPage.goto('http://127.0.0.1:4321/');
 	await expect(noJsPage.getByRole('heading', { level: 1 })).toBeVisible();

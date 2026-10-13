@@ -10,10 +10,12 @@ export default defineConfig({
 		screenshot: 'only-on-failure',
 	},
 	webServer: {
-		command: 'npx astro dev --background --host 127.0.0.1',
+		command: 'npm run build && npm run preview -- --host 127.0.0.1 --port 4321',
+		// Let Playwright own the process; prevent Astro's agent-triggered detachment.
+		env: { ASTRO_PREVIEW_BACKGROUND: '1', ASTRO_TELEMETRY_DISABLED: '1' },
 		url: 'http://127.0.0.1:4321',
-		reuseExistingServer: true,
-		timeout: 30_000,
+		reuseExistingServer: false,
+		timeout: 60_000,
 	},
 	projects: [
 		{ name: 'chromium', use: { ...devices['Desktop Chrome'] } },
